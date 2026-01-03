@@ -133,32 +133,31 @@ function analyzeShots() {
   dx /= shots.length;
   dy /= shots.length;
 
- 
- let direction = "";
+  let direction = "";
 
   if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
     direction = "تجميع ممتاز في المركز";
   } else if (dx > 0 && dy < 0) {
-    direction = " يمين أعلى – شد زائد بصباع التريجر مع زق بالمعصم";
+    direction = "يمين أعلى – شد زائد بالسبابة";
   } else if (dx < 0 && dy < 0) {
-    direction = "يسار أعلى – زق بالمعصم مع نتش التريجر ";
+    direction = "يسار أعلى – رفع المعصم";
   } else if (dx > 0 && dy > 0) {
-    direction = "يمين أسفل – سقوط السن مع تدخل الأصابع اثناء السحب مع شد التريجر بدخول زائد للسبابة";
+    direction = "يمين أسفل – جذب بالراحة";
   } else if (dx < 0 && dy > 0) {
-    direction = "يسار أسفل – نتش التريجر بطرف السبابة مع عدم تثبيت المعصم ";
+    direction = "يسار أسفل – ضعف تثبيت";
   } else if (dx > 0) {
-    direction = "يمين – تدخل الأصابع اثناء السحب مع شد التريجر بدخول زائد للسبابة ";
+    direction = "يمين – ضغط جانبي";
   } else if (dx < 0) {
-    direction = "يسار – ضغط بأطراف الأصابع على القبضة أو سحب بطرف السبابة ";
+    direction = "يسار – لف القبضة";
   } else if (dy < 0) {
-    direction = "أعلى – دفع بالمعصم لأعلى أو سقوط الرأس لأسفل";
+    direction = "أعلى – رفع الرأس";
   } else if (dy > 0) {
-    direction = "أسفل – دفع بالمعصم لأسفل أو رفع الرأس لأعلى";
+    direction = "أسفل – كسر المعصم";
   }
 
   resultBox.innerHTML = `
     <h3>نتيجة التحليل</h3>
     <p>عدد الطلقات: ${shots.length}</p>
-    <p><strong>الخطأ الغالب:</strong> ${result}</p>
+    <p><strong>الخطأ الغالب:</strong> ${direction}</p>
   `;
 }
