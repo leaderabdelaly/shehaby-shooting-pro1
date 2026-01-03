@@ -33,7 +33,7 @@ fetch("lang.json")
 /* ---------- واتساب ---------- */
 
 document.getElementById("whatsBtn").href =
-  "https://wa.me/201234567890?text=عاوز%20اشترك%20في%20Shehaby%20Shooting%20Pro";
+  "https://wa.me/201067050007?text=عاوز%20اشترك%20في%20Shehaby%20Shooting%20Pro";
 
 /* ---------- اللغة ---------- */
 
@@ -172,3 +172,4 @@ function updateProUI() {
   document.getElementById("proBadge").style.display =
     IS_PRO ? "inline-block" : "none";
 }
+
