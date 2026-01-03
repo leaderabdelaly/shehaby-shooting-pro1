@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>Shehaby Shooting Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <h1 id="appTitle">Shehaby Shooting Pro</h1>
+
+  <button id="langToggle">EN</button>
+</header>
+
+<section id="uploadSection">
+  <input type="file" id="imageInput" accept="image/*">
+</section>
+
+<section id="canvasSection">
+  <canvas id="targetCanvas"></canvas>
+</section>
+
+<section id="controls">
+  <button id="setCenterBtn">&#1578;&#1581;&#1583;&#1610;&#1583; &#1605;&#1585;&#1603;&#1586; &#1575;&#1604;&#1607;&#1583;&#1601;</button>
+  <button id="undoBtn">&#1578;&#1585;&#1575;&#1580;&#1593;</button>
+  <button id="analyzeBtn">&#1576;&#1583;&#1569; &#1578;&#1581;&#1604;&#1610;&#1604; &#1575;&#1604;&#1571;&#1582;&#1591;&#1575;&#1569;</button>
+</section>
+
+<section id="result">
+  <p id="analysisText"></p>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>

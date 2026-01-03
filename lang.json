@@ -1,0 +1,58 @@
+﻿{
+  "ui": {
+    "upload": {
+      "ar": "تحميل صورة الهدف",
+      "en": "Upload target image"
+    },
+    "setCenter": {
+      "ar": "تحديد مركز الهدف",
+      "en": "Set target center"
+    },
+    "undo": {
+      "ar": "تراجع",
+      "en": "Undo"
+    },
+    "analyze": {
+      "ar": "بدء تحليل الأخطاء",
+      "en": "Analyze shots"
+    }
+  },
+
+  "free": {
+    "limit": {
+      "ar": "النسخة المجانية تسمح بـ 10 طلقات فقط",
+      "en": "Free version allows only 10 shots"
+    },
+    "no_fix": {
+      "ar": "طريقة العلاج متاحة في النسخة المدفوعة",
+      "en": "Correction methods available in Pro version"
+    }
+  },
+
+  "errors": {
+    "left": {
+      "ar": "سحب الزناد لليسار",
+      "en": "Trigger pulled to the left",
+      "fix_ar": "اضغط الزناد تدريجياً دون شد جانبي",
+      "fix_en": "Press trigger smoothly without lateral pull"
+    },
+    "right": {
+      "ar": "سحب الزناد لليمين",
+      "en": "Trigger pulled to the right",
+      "fix_ar": "خفف ضغط الإبهام وثبت القبضة",
+      "fix_en": "Relax thumb pressure and stabilize grip"
+    },
+    "up": {
+      "ar": "رفع السلاح قبل خروج الطلقة",
+      "en": "Anticipating recoil",
+      "fix_ar": "ثبت المعصم ولا تسبق الطلقة",
+      "fix_en": "Do not anticipate recoil"
+    },
+    "down": {
+      "ar": "دفع السلاح لأسفل",
+      "en": "Pushing the gun downward",
+      "fix_ar": "دع الطلقة تخرج دون مقاومة",
+      "fix_en": "Allow natural shot break"
+    }
+  }
+}
