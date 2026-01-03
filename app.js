@@ -1,175 +1,164 @@
-let canvas = document.getElementById("targetCanvas");
-let ctx = canvas.getContext("2d");
+/* ==============================
+   Shehaby Shooting Pro
+   app.js – Mobile & Desktop Fixed
+   ============================== */
 
-let img = new Image();
+const targetInput = document.getElementById("targetInput");
+const targetImg = document.getElementById("targetImg");
+const targetContainer = document.getElementById("targetContainer");
+const analyzeBtn = document.getElementById("analyzeBtn");
+const resultBox = document.getElementById("result");
+
 let shots = [];
-let center = null;
-let mode = "shot";
-let lang = "ar";
+let centerPoint = null;
 
-const MAX_FREE_SHOTS = 10;
+/* ==============================
+   Helpers
+   ============================== */
 
-// حالة الاشتراك
-let IS_PRO = localStorage.getItem("shehaby_pro") === "true";
+function getScaledPosition(event) {
+  const rect = targetImg.getBoundingClientRect();
 
-// أكواد التفعيل
-const PRO_CODES = [
-  "SHP-1001",
-  "SHP-1002",
-  "SHP-1003",
-  "SHP-1004"
-];
+  const scaleX = targetImg.naturalWidth / rect.width;
+  const scaleY = targetImg.naturalHeight / rect.height;
 
-let LANG = null;
+  const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+  const clientY = event.touches ? event.touches[0].clientY : event.clientY;
 
-fetch("lang.json")
-  .then(r => r.json())
-  .then(d => {
-    LANG = d;
-    applyLanguage();
-    updateProUI();
-  });
+  const x = (clientX - rect.left) * scaleX;
+  const y = (clientY - rect.top) * scaleY;
 
-/* ---------- واتساب ---------- */
-
-document.getElementById("whatsBtn").href =
-  "https://wa.me/201067050007?text=عاوز%20اشترك%20في%20Shehaby%20Shooting%20Pro";
-
-/* ---------- اللغة ---------- */
-
-document.getElementById("langToggle").onclick = () => {
-  lang = lang === "ar" ? "en" : "ar";
-  document.getElementById("langToggle").innerText = lang === "ar" ? "EN" : "AR";
-  applyLanguage();
-};
-
-function applyLanguage() {
-  if (!LANG) return;
-  document.getElementById("setCenterBtn").innerText = LANG.ui.setCenter[lang];
-  document.getElementById("undoBtn").innerText = LANG.ui.undo[lang];
-  document.getElementById("analyzeBtn").innerText = LANG.ui.analyze[lang];
+  return { x, y, scaleX, scaleY };
 }
 
-/* ---------- صورة الهدف ---------- */
+function drawDot(x, y, className) {
+  const rect = targetImg.getBoundingClientRect();
 
-document.getElementById("imageInput").addEventListener("change", e => {
+  const scaleX = targetImg.naturalWidth / rect.width;
+  const scaleY = targetImg.naturalHeight / rect.height;
+
+  const dot = document.createElement("div");
+  dot.className = className;
+
+  dot.style.left = `${x / scaleX}px`;
+  dot.style.top = `${y / scaleY}px`;
+
+  targetContainer.appendChild(dot);
+}
+
+/* ==============================
+   Load Target Image
+   ============================== */
+
+targetInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  img = new Image();
-  img.onload = () => {
-    canvas.width = img.width;
-    canvas.height = img.height;
-    redraw();
+  const reader = new FileReader();
+  reader.onload = () => {
+    targetImg.src = reader.result;
+    targetImg.style.display = "block";
+    resetAll();
   };
-  img.src = URL.createObjectURL(file);
+  reader.readAsDataURL(file);
 });
 
-/* ---------- التحكم ---------- */
+function resetAll() {
+  shots = [];
+  centerPoint = null;
+  resultBox.innerHTML = "";
+  document.querySelectorAll(".shot, .center").forEach(el => el.remove());
+}
 
-document.getElementById("setCenterBtn").onclick = () => mode = "center";
+/* ==============================
+   Set Center Point
+   ============================== */
 
-document.getElementById("undoBtn").onclick = () => {
-  shots.pop();
-  redraw();
-};
-
-canvas.addEventListener("click", e => {
-  if (!img.src) return;
-
-  const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
-
-  const x = (e.clientX - rect.left) * scaleX;
-  const y = (e.clientY - rect.top) * scaleY;
-
-  if (mode === "center") {
-    center = { x, y };
-    mode = "shot";
-  } else {
-    if (!IS_PRO && shots.length >= MAX_FREE_SHOTS) {
-      openUpgrade();
-      return;
-    }
-    shots.push({ x, y });
+targetImg.addEventListener("dblclick", setCenter);
+targetImg.addEventListener("touchstart", (e) => {
+  if (e.touches.length === 2) {
+    setCenter(e);
   }
-  redraw();
 });
 
-/* ---------- الرسم ---------- */
+function setCenter(event) {
+  event.preventDefault();
+  if (!targetImg.src) return;
 
-function redraw() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  if (img.src) ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  document.querySelectorAll(".center").forEach(el => el.remove());
 
-  if (center) {
-    ctx.fillStyle = "red";
-    ctx.beginPath();
-    ctx.arc(center.x, center.y, 6, 0, Math.PI*2);
-    ctx.fill();
+  const pos = getScaledPosition(event);
+  centerPoint = { x: pos.x, y: pos.y };
+
+  drawDot(pos.x, pos.y, "center");
+}
+
+/* ==============================
+   Add Shot
+   ============================== */
+
+targetImg.addEventListener("click", addShot);
+targetImg.addEventListener("touchend", addShot);
+
+function addShot(event) {
+  if (!targetImg.src || !centerPoint) return;
+
+  const pos = getScaledPosition(event);
+
+  shots.push({ x: pos.x, y: pos.y });
+
+  drawDot(pos.x, pos.y, "shot");
+}
+
+/* ==============================
+   Analysis
+   ============================== */
+
+analyzeBtn.addEventListener("click", analyzeShots);
+
+function analyzeShots() {
+  if (!centerPoint || shots.length === 0) {
+    resultBox.innerHTML = "❌ حدد مركز الهدف والطلقات أولاً";
+    return;
   }
 
-  ctx.fillStyle = "blue";
-  shots.forEach((s,i)=>{
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, 4, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillText(i+1, s.x+6, s.y);
+  let dx = 0;
+  let dy = 0;
+
+  shots.forEach(s => {
+    dx += s.x - centerPoint.x;
+    dy += s.y - centerPoint.y;
   });
-}
 
-/* ---------- التحليل ---------- */
+  dx /= shots.length;
+  dy /= shots.length;
 
-document.getElementById("analyzeBtn").onclick = () => {
-  if (!center || shots.length === 0) return;
+ 
+ let direction = "";
 
-  let counts = {left:0,right:0,up:0,down:0};
-
-  shots.forEach(s=>{
-    if (s.x < center.x-10) counts.left++;
-    if (s.x > center.x+10) counts.right++;
-    if (s.y < center.y-10) counts.up++;
-    if (s.y > center.y+10) counts.down++;
-  });
-
-  let error = Object.keys(counts).reduce((a,b)=>counts[a]>counts[b]?a:b);
-  let text = LANG.errors[error][lang];
-
-  if (IS_PRO) {
-    text += " — " + LANG.errors[error]["fix_"+lang];
-  } else {
-    text += " — " + LANG.free.no_fix[lang];
+  if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+    direction = "تجميع ممتاز في المركز";
+  } else if (dx > 0 && dy < 0) {
+    direction = " يمين أعلى – شد زائد بصباع التريجر مع زق بالمعصم";
+  } else if (dx < 0 && dy < 0) {
+    direction = "يسار أعلى – زق بالمعصم مع نتش التريجر ";
+  } else if (dx > 0 && dy > 0) {
+    direction = "يمين أسفل – سقوط السن مع تدخل الأصابع اثناء السحب مع شد التريجر بدخول زائد للسبابة";
+  } else if (dx < 0 && dy > 0) {
+    direction = "يسار أسفل – نتش التريجر بطرف السبابة مع عدم تثبيت المعصم ";
+  } else if (dx > 0) {
+    direction = "يمين – تدخل الأصابع اثناء السحب مع شد التريجر بدخول زائد للسبابة ";
+  } else if (dx < 0) {
+    direction = "يسار – ضغط بأطراف الأصابع على القبضة أو سحب بطرف السبابة ";
+  } else if (dy < 0) {
+    direction = "أعلى – دفع بالمعصم لأعلى أو سقوط الرأس لأسفل";
+  } else if (dy > 0) {
+    direction = "أسفل – دفع بالمعصم لأسفل أو رفع الرأس لأعلى";
   }
 
-  document.getElementById("analysisText").innerText = text;
-};
-
-/* ---------- Pro ---------- */
-
-function openUpgrade() {
-  document.getElementById("upgradeOverlay").style.display = "block";
+  resultBox.innerHTML = `
+    <h3>نتيجة التحليل</h3>
+    <p>عدد الطلقات: ${shots.length}</p>
+    <p><strong>الخطأ الغالب:</strong> ${result}</p>
+  `;
 }
-
-function closeUpgrade() {
-  document.getElementById("upgradeOverlay").style.display = "none";
-}
-
-document.getElementById("activateProBtn").onclick = () => {
-  const code = document.getElementById("proCodeInput").value.trim();
-  if (PRO_CODES.includes(code)) {
-    localStorage.setItem("shehaby_pro", "true");
-    IS_PRO = true;
-    closeUpgrade();
-    updateProUI();
-    alert("تم تفعيل النسخة الاحترافية بنجاح");
-  } else {
-    alert("كود غير صحيح");
-  }
-};
-
-function updateProUI() {
-  document.getElementById("proBadge").style.display =
-    IS_PRO ? "inline-block" : "none";
-}
-
