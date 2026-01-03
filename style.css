@@ -22,7 +22,7 @@ header {
   margin-right: 5px;
 }
 
-button {
+button, a {
   padding: 10px;
   margin: 5px;
   font-size: 16px;
@@ -38,7 +38,7 @@ canvas {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0,0,0,0.85);
 }
 
 .overlay-content {
@@ -53,4 +53,12 @@ canvas {
 .pay-text {
   font-size: 14px;
   color: #444;
+}
+
+#whatsBtn {
+  display: block;
+  background: #25D366;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
 }
