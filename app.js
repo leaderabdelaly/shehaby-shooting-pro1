@@ -1,5 +1,3 @@
-﻿/* ================== الإعدادات ================== */
-
 let canvas = document.getElementById("targetCanvas");
 let ctx = canvas.getContext("2d");
 
@@ -10,20 +8,21 @@ let mode = "shot";
 let lang = "ar";
 
 const MAX_FREE_SHOTS = 10;
-const IS_PRO = false; // تتحول true مع الاشتراك
+
+// حالة الاشتراك
+let IS_PRO = localStorage.getItem("shehaby_pro") === "true";
 
 let LANG = null;
 
-/* ================== تحميل اللغة ================== */
-
 fetch("lang.json")
-  .then(res => res.json())
-  .then(data => {
-    LANG = data;
+  .then(r => r.json())
+  .then(d => {
+    LANG = d;
     applyLanguage();
+    updateProUI();
   });
 
-/* ================== تبديل اللغة ================== */
+/* ---------- اللغة ---------- */
 
 document.getElementById("langToggle").onclick = () => {
   lang = lang === "ar" ? "en" : "ar";
@@ -33,20 +32,12 @@ document.getElementById("langToggle").onclick = () => {
 
 function applyLanguage() {
   if (!LANG) return;
-
-  document.documentElement.lang = lang;
-
-  document.getElementById("setCenterBtn").innerText =
-    LANG.ui.setCenter[lang];
-
-  document.getElementById("undoBtn").innerText =
-    LANG.ui.undo[lang];
-
-  document.getElementById("analyzeBtn").innerText =
-    LANG.ui.analyze[lang];
+  document.getElementById("setCenterBtn").innerText = LANG.ui.setCenter[lang];
+  document.getElementById("undoBtn").innerText = LANG.ui.undo[lang];
+  document.getElementById("analyzeBtn").innerText = LANG.ui.analyze[lang];
 }
 
-/* ================== تحميل صورة الهدف ================== */
+/* ---------- صورة الهدف ---------- */
 
 document.getElementById("imageInput").addEventListener("change", e => {
   const file = e.target.files[0];
@@ -61,26 +52,19 @@ document.getElementById("imageInput").addEventListener("change", e => {
   img.src = URL.createObjectURL(file);
 });
 
-/* ================== أزرار التحكم ================== */
+/* ---------- التحكم ---------- */
 
-document.getElementById("setCenterBtn").onclick = () => {
-  mode = "center";
-};
+document.getElementById("setCenterBtn").onclick = () => mode = "center";
 
 document.getElementById("undoBtn").onclick = () => {
-  if (shots.length > 0) {
-    shots.pop();
-    redraw();
-  }
+  shots.pop();
+  redraw();
 };
-
-/* ================== الضغط على الهدف (موبايل + ويب) ================== */
 
 canvas.addEventListener("click", e => {
   if (!img.src) return;
 
   const rect = canvas.getBoundingClientRect();
-
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
 
@@ -92,66 +76,85 @@ canvas.addEventListener("click", e => {
     mode = "shot";
   } else {
     if (!IS_PRO && shots.length >= MAX_FREE_SHOTS) {
-      alert(LANG.free.limit[lang]);
+      openUpgrade();
       return;
     }
     shots.push({ x, y });
   }
-
   redraw();
 });
 
-/* ================== الرسم ================== */
+/* ---------- الرسم ---------- */
 
 function redraw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  if (img.complete && img.src) {
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  }
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if (img.src) ctx.drawImage(img,0,0,canvas.width,canvas.height);
 
   if (center) {
     ctx.fillStyle = "red";
     ctx.beginPath();
-    ctx.arc(center.x, center.y, 6, 0, Math.PI * 2);
+    ctx.arc(center.x, center.y, 6, 0, Math.PI*2);
     ctx.fill();
   }
 
   ctx.fillStyle = "blue";
-  shots.forEach((s, i) => {
+  shots.forEach((s,i)=>{
     ctx.beginPath();
-    ctx.arc(s.x, s.y, 4, 0, Math.PI * 2);
+    ctx.arc(s.x, s.y, 4, 0, Math.PI*2);
     ctx.fill();
-    ctx.fillText(i + 1, s.x + 6, s.y);
+    ctx.fillText(i+1, s.x+6, s.y);
   });
 }
 
-/* ================== التحليل ================== */
+/* ---------- التحليل ---------- */
 
-document.getElementById("analyzeBtn").onclick = analyze;
-
-function analyze() {
+document.getElementById("analyzeBtn").onclick = () => {
   if (!center || shots.length === 0) return;
 
-  let counts = { left:0, right:0, up:0, down:0 };
+  let counts = {left:0,right:0,up:0,down:0};
 
-  shots.forEach(s => {
-    if (s.x < center.x - 10) counts.left++;
-    if (s.x > center.x + 10) counts.right++;
-    if (s.y < center.y - 10) counts.up++;
-    if (s.y > center.y + 10) counts.down++;
+  shots.forEach(s=>{
+    if (s.x < center.x-10) counts.left++;
+    if (s.x > center.x+10) counts.right++;
+    if (s.y < center.y-10) counts.up++;
+    if (s.y > center.y+10) counts.down++;
   });
 
-  const error = Object.keys(counts)
-    .reduce((a,b) => counts[a] > counts[b] ? a : b);
-
-  let result = LANG.errors[error][lang];
+  let error = Object.keys(counts).reduce((a,b)=>counts[a]>counts[b]?a:b);
+  let text = LANG.errors[error][lang];
 
   if (IS_PRO) {
-    result += " — " + LANG.errors[error]["fix_" + lang];
+    text += " — " + LANG.errors[error]["fix_"+lang];
   } else {
-    result += " — " + LANG.free.no_fix[lang];
+    text += " — " + LANG.free.no_fix[lang];
   }
 
-  document.getElementById("analysisText").innerText = result;
+  document.getElementById("analysisText").innerText = text;
+};
+
+/* ---------- Pro ---------- */
+
+function openUpgrade() {
+  document.getElementById("upgradeOverlay").style.display = "block";
+}
+
+function closeUpgrade() {
+  document.getElementById("upgradeOverlay").style.display = "none";
+}
+
+document.getElementById("activateProBtn").onclick = () => {
+  const code = document.getElementById("proCodeInput").value.trim();
+  if (code === "SHEHABY2024") {
+    localStorage.setItem("shehaby_pro", "true");
+    IS_PRO = true;
+    closeUpgrade();
+    updateProUI();
+    alert("تم تفعيل النسخة الاحترافية بنجاح");
+  } else {
+    alert("كود غير صحيح");
+  }
+};
+
+function updateProUI() {
+  document.getElementById("proBadge").style.display = IS_PRO ? "inline-block" : "none";
 }
