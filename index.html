@@ -13,27 +13,50 @@
 
 <header>
   <h1 id="appTitle">Shehaby Shooting Pro</h1>
-
-  <button id="langToggle">EN</button>
+  <div>
+    <span id="proBadge" style="display:none;">⭐ PRO</span>
+    <button id="langToggle">EN</button>
+  </div>
 </header>
 
 <section id="uploadSection">
   <input type="file" id="imageInput" accept="image/*">
 </section>
 
-<section id="canvasSection">
-  <canvas id="targetCanvas"></canvas>
-</section>
+<canvas id="targetCanvas"></canvas>
 
 <section id="controls">
-  <button id="setCenterBtn">&#1578;&#1581;&#1583;&#1610;&#1583; &#1605;&#1585;&#1603;&#1586; &#1575;&#1604;&#1607;&#1583;&#1601;</button>
-  <button id="undoBtn">&#1578;&#1585;&#1575;&#1580;&#1593;</button>
-  <button id="analyzeBtn">&#1576;&#1583;&#1569; &#1578;&#1581;&#1604;&#1610;&#1604; &#1575;&#1604;&#1571;&#1582;&#1591;&#1575;&#1569;</button>
+  <button id="setCenterBtn">تحديد مركز الهدف</button>
+  <button id="undoBtn">تراجع</button>
+  <button id="analyzeBtn">بدء تحليل الأخطاء</button>
 </section>
 
 <section id="result">
   <p id="analysisText"></p>
 </section>
+
+<!-- Upgrade Overlay -->
+<div id="upgradeOverlay" class="overlay">
+  <div class="overlay-content">
+    <h2>النسخة الاحترافية</h2>
+    <p>
+      النسخة الاحترافية تتيح:
+      <br>• عدد طلقات غير محدود
+      <br>• تحليل كل طلقة
+      <br>• طريقة علاج الخطأ
+    </p>
+
+    <p class="pay-text">
+      للتفعيل:
+      <br>حوّل الاشتراك عبر فودافون كاش أو إنستا باي
+      <br>ثم أدخل كود التفعيل
+    </p>
+
+    <input type="text" id="proCodeInput" placeholder="أدخل كود التفعيل">
+    <button id="activateProBtn">تفعيل النسخة الاحترافية</button>
+    <button onclick="closeUpgrade()">لاحقًا</button>
+  </div>
+</div>
 
 <script src="app.js"></script>
 </body>
