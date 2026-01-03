@@ -12,14 +12,6 @@ const MAX_FREE_SHOTS = 10;
 // حالة الاشتراك
 let IS_PRO = localStorage.getItem("shehaby_pro") === "true";
 
-// أكواد التفعيل
-const PRO_CODES = [
-  "SHP-1001",
-  "SHP-1002",
-  "SHP-1003",
-  "SHP-1004"
-];
-
 let LANG = null;
 
 fetch("lang.json")
@@ -29,11 +21,6 @@ fetch("lang.json")
     applyLanguage();
     updateProUI();
   });
-
-/* ---------- واتساب ---------- */
-
-document.getElementById("whatsBtn").href =
-  "https://wa.me/201234567890?text=عاوز%20اشترك%20في%20Shehaby%20Shooting%20Pro";
 
 /* ---------- اللغة ---------- */
 
@@ -157,7 +144,7 @@ function closeUpgrade() {
 
 document.getElementById("activateProBtn").onclick = () => {
   const code = document.getElementById("proCodeInput").value.trim();
-  if (PRO_CODES.includes(code)) {
+  if (code === "SHEHABY2024") {
     localStorage.setItem("shehaby_pro", "true");
     IS_PRO = true;
     closeUpgrade();
@@ -169,6 +156,5 @@ document.getElementById("activateProBtn").onclick = () => {
 };
 
 function updateProUI() {
-  document.getElementById("proBadge").style.display =
-    IS_PRO ? "inline-block" : "none";
+  document.getElementById("proBadge").style.display = IS_PRO ? "inline-block" : "none";
 }
